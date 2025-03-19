@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: bootiful-audio
+  ai:
+    openai:
+      image:
+        enabled: false
+      embedding:
+        enabled: false
+      chat:
+        enabled: false
+      audio:
+        transcription:
+          enabled: false
+    anthropic:
+      chat:
+        enabled: false
