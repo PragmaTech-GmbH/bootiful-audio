@@ -45,8 +45,6 @@ jobs:
           echo "IMAGE_ID=ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_REPO }}" >> $GITHUB_ENV
           echo "IMAGE_ID_WITH_SHA=${{ env.IMAGE_ID }}:${{ env.IMAGE_SHA_TAG }}" >> $GITHUB_ENV
           echo "IMAGE_ID_LATEST=${{ env.IMAGE_ID }}:latest" >> $GITHUB_ENV
-          echo "Using Image ID (SHA): ${{ env.IMAGE_ID_WITH_SHA }}"
-          echo "Using Image ID (Latest): ${{ IMAGE_ID_LATEST }}"
 
       - name: Build and Push Native Docker Image
         run: |
