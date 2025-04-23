@@ -29,3 +29,6 @@ Thumbs.db
 # Build reports/artifacts not needed in image
 **/failsafe-reports/
 **/surefire-reports/
+
+src/main/frontend/generated
+src/main/frontendvaaa/index.html

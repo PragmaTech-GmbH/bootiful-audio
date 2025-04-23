@@ -32,4 +32,7 @@ build/
 ### VS Code ###
 .vscode/
 
+### Custom ###
 .env
+src/main/frontend/generated
+src/main/frontend/index.html

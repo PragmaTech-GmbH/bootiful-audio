@@ -57,7 +57,7 @@ jobs:
 
       - name: Build and Push Native Docker Image
         run: |
-          ./mvnw -Pnative -B \
+          ./mvnw -Pnative,production -B \
           -DskipTests \
           spring-boot:build-image
 
