@@ -7,10 +7,7 @@ app = 'bootiful-audio'
 primary_region = 'fra'
 
 [env]
-  APP_PASSWORD = 'change-me'
-  APP_USER = 'change-me'
-  SPRING_AI_OPENAI_API_KEY = 'change-me'
-  VAADIN_PRODUCTION_MODE = 'change-me'
+  VAADIN_PRODUCTION_MODE = 'true'
 
 [http_service]
   internal_port = 8080
