@@ -3,15 +3,13 @@ spring:
     name: bootiful-audio
   ai:
     openai:
-      image:
-        enabled: false
-      embedding:
-        enabled: false
-      chat:
-        enabled: false
+      api-key: ${SPRING_AI_OPENAI_API_KEY}
       audio:
         transcription:
-          enabled: false
-    anthropic:
-      chat:
-        enabled: false
+          options:
+            model: whisper-1
+  security:
+    user:
+      name: ${APP_USER:user}
+      password: ${APP_PASSWORD:password}
+      roles: USER

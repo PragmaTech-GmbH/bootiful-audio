@@ -1,0 +1,31 @@
+app = "bootiful-audio"
+primary_region = "fra"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
+
+[env]
+  VAADIN_PRODUCTION_MODE = "change-me"
+  APP_USER = "change-me"
+  APP_PASSWORD = "change-me"
+  SPRING_AI_OPENAI_API_KEY = "change-me"
+
+[[checks]]
+  port = 8080
+  type = "http"
+  interval = "15s"
+  timeout = "5s"
+  grace_period = "10s"
+  path = "/actuator/health"
+  method = "GET"
+  protocol = "http"

@@ -1,52 +1,68 @@
-name: Build and Deploy Spring Boot App
-
+name: Deploy Application
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main # Trigger deployment on push to main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 24
-        uses: actions/setup-java@v3
-        with:
-          java-version: '24'
-          distribution: 'corretto'
-          cache: maven
-
-      - name: Build with Maven
-        run: ./mvnw package
-
-      - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app
-          path: target/bootiful-audio.jar
-          retention-days: 1
   deploy:
-    needs: build
+    name: Deploy App
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
+
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      SPRING_AI_OPENAI_API_KEY: ${{ secrets.SPRING_AI_OPENAI_API_KEY }}
+      APP_USER: ${{ secrets.APP_USER }}
+      APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+      VAADIN_PRODUCTION_MODE: true
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Download JAR artifact
-        uses: actions/download-artifact@v4
+      - name: Set up Java 24
+        uses: actions/setup-java@v4
         with:
-          name: app
-          path: target
+          distribution: 'temurin'
+          java-version: '24'
+          cache: 'maven'
 
-      - name: List files
-        run: ls -la target/
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Trigger Coolify Deployment
+      - name: Set Image Name Variables
         run: |
-          curl -X POST ${{ secrets.COOLIFY_WEBHOOK_URL }} \
-            -H "Content-Type: application/json" \
-            -d '{"ref": "${{ github.ref }}", "repository": {"url": "${{ github.repository }}"}}' \
-            --fail
+          echo "IMAGE_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "IMAGE_REPO=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "IMAGE_SHA_TAG=${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Define Full Image ID
+        run: |
+          echo "IMAGE_ID=ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_REPO }}" >> $GITHUB_ENV
+          echo "IMAGE_ID_WITH_SHA=${{ env.IMAGE_ID }}:${{ env.IMAGE_SHA_TAG }}" >> $GITHUB_ENV
+          echo "IMAGE_ID_LATEST=${{ env.IMAGE_ID }}:latest" >> $GITHUB_ENV
+          echo "Using Image ID (SHA): ${IMAGE_ID_WITH_SHA}"
+          echo "Using Image ID (Latest): ${IMAGE_ID_LATEST}"
+
+      # Build and Push Native Image using Spring Boot Plugin
+      # This command builds AND pushes the image because the plugin handles it.
+      # It will create and push both the SHA-tagged image and the 'latest' tag.
+      - name: Build and Push Native Docker Image
+        run: |
+          ./mvnw -Pnative -B \
+          -DskipTests \
+          -Dspring-boot.build-image.imageName="${{ env.IMAGE_ID_LATEST }}" \
+          -Dspring-boot.build-image.tags="${{ env.IMAGE_SHA_TAG }}" \
+          spring-boot:build-image
+
+      - name: Set up Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl deploy --app bootiful-audio --image "${{ env.IMAGE_ID_WITH_SHA }}"
