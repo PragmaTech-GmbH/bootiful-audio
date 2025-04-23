@@ -48,15 +48,10 @@ jobs:
           echo "Using Image ID (SHA): ${IMAGE_ID_WITH_SHA}"
           echo "Using Image ID (Latest): ${IMAGE_ID_LATEST}"
 
-      # Build and Push Native Image using Spring Boot Plugin
-      # This command builds AND pushes the image because the plugin handles it.
-      # It will create and push both the SHA-tagged image and the 'latest' tag.
       - name: Build and Push Native Docker Image
         run: |
           ./mvnw -Pnative -B \
           -DskipTests \
-          -Dspring-boot.build-image.imageName="${{ env.IMAGE_ID_LATEST }}" \
-          -Dspring-boot.build-image.tags="${{ env.IMAGE_SHA_TAG }}" \
           spring-boot:build-image
 
       - name: Set up Fly CLI
