@@ -53,8 +53,10 @@ jobs:
         run: |
           ./mvnw -Pnative -B \
           -DskipTests \
-          -Dspring-boot.build-image.tags="${{ env.IMAGE_SHA_TAG }}" \
           spring-boot:build-image
+
+          docker tag "${{ env.IMAGE_ID_LATEST }}" "${{ env.IMAGE_ID_WITH_SHA }}"
+          docker push "${{ env.IMAGE_ID_WITH_SHA }}"
 
       - name: Set up Fly CLI
         uses: superfly/flyctl-actions/setup-flyctl@master
