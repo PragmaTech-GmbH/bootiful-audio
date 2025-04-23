@@ -38,10 +38,13 @@ jobs:
         run: |
           echo "IMAGE_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
           echo "IMAGE_REPO=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-          echo "IMAGE_ID=ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_REPO }}" >> $GITHUB_ENV
           echo "IMAGE_SHA_TAG=${{ github.sha }}" >> $GITHUB_ENV
 
-      - name: Define Full Image ID
+      - name: Define Image ID
+        run: |
+          echo "IMAGE_ID=ghcr.io/${{ env.IMAGE_OWNER }}/${{ env.IMAGE_REPO }}" >> $GITHUB_ENV
+
+      - name: Define Tagged Image ID
         run: |
           echo "IMAGE_ID_WITH_SHA=${{ env.IMAGE_ID }}:${{ env.IMAGE_SHA_TAG }}" >> $GITHUB_ENV
           echo "IMAGE_ID_LATEST=${{ env.IMAGE_ID }}:latest" >> $GITHUB_ENV
