@@ -109,6 +109,7 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
           <image>
+            <name>ghcr.io/pragmatech-gmbh/bootiful-audio</name>
             <builder>paketobuildpacks/builder-jammy-buildpackless-tiny</builder><!--required for AArch64/M1 support -->
             <buildpacks>
               <buildpack>paketobuildpacks/oracle</buildpack>
