@@ -13,3 +13,7 @@ spring:
       name: ${APP_USER:user}
       password: ${APP_PASSWORD:password}
       roles: USER
+
+vaadin:
+  frontend:
+    hotdeploy: false
